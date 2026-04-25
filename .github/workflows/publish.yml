@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write  # required for npm provenance
+  id-token: write  # required for OIDC trusted publishing
 
 jobs:
   publish:
@@ -17,13 +17,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
       - run: npm ci
 
       - run: npm run build
 
-      - run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # NODE_AUTH_TOKEN not needed — npm CLI auto-detects OIDC
+      # and exchanges it for a short-lived publish token.
+      # Provenance attestation is generated automatically.
+      - run: npm publish
